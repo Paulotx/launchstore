@@ -236,7 +236,7 @@ form .item #photos-upload p {
 
 form .item #photos-input {
     position: absolute;
-    top: 0;
+    top: -20px;
     left: 0;
     display: block;
     overflow: hidden;
