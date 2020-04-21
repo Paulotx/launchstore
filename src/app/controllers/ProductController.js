@@ -1,4 +1,4 @@
-const { formatPrice } = require("../../lib/utils");
+const { formatPrice, date } = require("../../lib/utils");
 
 const Category = require("../models/Category");
 const Product  = require("../models/Product");
@@ -55,6 +55,32 @@ module.exports = {
         return res.redirect(`/products/${ productId }/edit`);
     },
 
+    async show(req, res) {
+
+        let results = await Product.find(req.params.id);
+        const product = results.rows[0];
+
+        if(!product) return res.send("Product Not Found!");
+
+        const { minutes, hour, day, month } = date(product.updated_at);
+
+        product.published = {
+            hour: `${ hour }h${ minutes }`,
+            day: `${ day }/${ month }`
+        }
+
+        product.old_price = formatPrice(product.old_price);
+        product.price     = formatPrice(product.price);
+        
+        results = await Product.files(product.id);
+        const files = results.rows.map(file => ({
+            ...file,
+            src: `${ req.protocol }://${ req.headers.host }${ file.path.replace("public", "")}`
+        }));
+
+        return res.render("products/show", { product, files });
+    },
+
     async edit(req, res) {
         let results   = await Product.find(req.params.id);
         const product = results.rows[0];
@@ -106,8 +132,10 @@ module.exports = {
 
         if(req.body.old_price != req.body.price) {
             const oldProduct = await Product.find(req.body.id);
-
-            req.body.old_price = oldProduct.rows[0].price;
+            
+            if(oldProduct.rows[0].price != req.body.price.replace(/\D/g, "")) {
+                req.body.old_price = oldProduct.rows[0].price;
+            }            
         }
 
         const values = [
@@ -124,7 +152,7 @@ module.exports = {
 
         await Product.update(values);
 
-        return res.redirect(`/products/${ req.body.id }/edit`);
+        return res.redirect(`/products/${ req.body.id }`);
     },
 
     async delete(req, res) {
