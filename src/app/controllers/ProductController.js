@@ -37,7 +37,7 @@ module.exports = {
 
         const values = [
             req.body.category_id,
-            req.body.user_id || 1,
+            req.session.userId,
             req.body.name,
             req.body.description,
             req.body.old_price || req.body.price.replace(/\D/g, ""),
@@ -140,7 +140,6 @@ module.exports = {
 
         const values = [
             req.body.category_id,
-            req.body.user_id || 1,
             req.body.name,
             req.body.description,
             req.body.old_price,

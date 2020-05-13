@@ -6,7 +6,6 @@
             name="name"
             placeholder="Digite seu nome completo"
             value="{{ user.name }}"
-            required
         >
     </div>
 </div>
@@ -20,7 +19,6 @@
             placeholder="Digite seu email"
             value="{{ user.email }}"
             onblur="Validade.apply(this, 'isEmail')"
-            required
         >
     </div>
 </div>
@@ -31,9 +29,12 @@
         <input 
             type="password"
             name="password"
-            placeholder="Escolha uma senha segura"
-            value="{{ user.password }}"
-            required
+            {% if not user.id %}
+                placeholder="Escolha uma senha segura"
+
+            {% else %}
+                placeholder="Digeite sua senha para atualizar"
+            {% endif %}
         >
     </div>
 </div>
@@ -46,7 +47,6 @@
                 type="password"
                 name="passwordRepeat"
                 placeholder="Repita a senha escolhida"
-                required
             >
         </div>
     </div>
@@ -62,7 +62,6 @@
             value="{{ user.cpf_cnpj }}"
             onkeydown="Mask.apply(this, 'cpfCnpj')"
             onblur="Validade.apply(this, 'isCpfCnpj')"
-            required
         >
     </div>
 </div>
