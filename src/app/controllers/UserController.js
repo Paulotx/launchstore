@@ -1,4 +1,9 @@
-const User = require("../models/User");
+const { unlinkSync } = require("fs");
+
+const User    = require("../models/User");
+const Product = require("../models/Product");
+const LoadProductsServirce = require("../services/LoadProductServices");
+
 const { hash } = require("bcryptjs");
 
 module.exports = {
@@ -7,28 +12,37 @@ module.exports = {
     },
 
     async post(req, res) {
-        const passwordHash = await hash(req.body.password, 8);
+        try {
+            let { name, email, password, cpf_cnpj, cep, address } = req.body;
 
-        const values = [
-            req.body.name,
-            req.body.email,
-            passwordHash,
-            req.body.cpf_cnpj,
-            req.body.cep,
-            req.body.address,
-        ];
+            password = await hash(password, 8);
 
-        const results = await User.create(values);
+            const userId = await User.create({
+                name,
+                email,
+                password,
+                cpf_cnpj,
+                cep,
+                address
+            });
 
-        req.session.userId = results.rows[0].id;
+            req.session.userId = userId;
 
-        return res.redirect("/users");
+            return res.redirect("/users");
+        } 
+        catch (err) {
+            console.error(err);
+        }
     },
 
     async show(req, res) {
-        const { user } = req;
-
-        return res.render("users/index", { user });
+        try {
+            const { user } = req;
+            return res.render("users/index", { user });
+        }
+        catch(err) {
+            console.error(err)
+        }        
     },
 
     async update(req, res) {
@@ -59,8 +73,25 @@ module.exports = {
 
     async delete(req, res) {
         try {
+            const products = await Product.findAll({ where: { user_id: req.body.id } });
+
+            const allFilesPromise = products.map(product => Product.files(product.id));
+            let promiseResults = await Promise.all(allFilesPromise);
+
             await User.delete(req.body.id);
-            req.session.destroy()
+
+            req.session.destroy();
+
+            promiseResults.map(files => {
+                files.map(file => {
+                    try {
+                        unlinkSync(file.path);
+                    }
+                    catch(err) {
+                        console.error(err);
+                    }
+                })
+            })
 
             return res.render("session/login", {
                 success: "Conta deletada com sucesso!"
@@ -71,8 +102,16 @@ module.exports = {
 
             return res.render("users/index", {
                 user: req.body,
-                error: "Erro ao tentar deletas sua conta!"
+                error: "Erro ao tentar deletar sua conta!"
             })
         }
+    },
+
+    async ads(req, res) {
+        const products = await LoadProductsServirce.load("products", {
+            where: { user_id: req.session.userId }
+        });
+
+        return res.render("users/ads", { products });
     }
 }

@@ -50,8 +50,8 @@
         </div>
 
         <div id="photos-preview">
-            {% if files %}
-                {% for image in files %}
+            {% if product.files %}
+                {% for image in product.files %}
                     <div class="photo" id="{{ image.id }}">
                         <img src="{{ image.src }}" alt="{{ image.name }}">
                         <i 
@@ -77,7 +77,7 @@
             type="text"
             name="price"
             placeholder="Preço do Produto"
-            value="{{ product.price }}"
+            value="{{ product.formattedPrice }}"
             onkeydown='Mask.apply(this, "formatBRL")'
         >
     </div>
@@ -101,25 +101,25 @@
 {% if (product.status == '1') or (product.status == '0') %}
     <div class="item">
         <div>Disponível ?</div>
-        <div class="sexo">
-            <span>
-                <input 
-                    type="radio" 
-                    name="status" 
-                    value="1" 
-                    {% if product.status == "1" %} checked {% endif %}
-                >
-                Sim
-            </span>
-            <span>
-                <input 
-                    type="radio" 
-                    name="status" 
-                    value="0"
-                    {% if product.status == "0" %} checked {% endif %}
-                >
-                Não
-            </span>
-        </div>
+
+        <span>
+            <input 
+                type="radio" 
+                name="status" 
+                value="1" 
+                {% if product.status == "1" %} checked {% endif %}
+            >
+            Sim
+        </span>
+        <span>
+            <input 
+                type="radio" 
+                name="status" 
+                value="0"
+                {% if product.status == "0" %} checked {% endif %}
+            >
+            Não
+        </span>
+
     </div>
 {% endif %}

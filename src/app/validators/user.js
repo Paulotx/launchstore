@@ -50,7 +50,7 @@ async function show(req, res, next) {
     const user = await User.findOne({ where: { id } });
 
     if(!user) {
-        return res.render("user/register", {
+        return res.render("users/register", {
             error: "Usuário não encontrado!"
         });
     }

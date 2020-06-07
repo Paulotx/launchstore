@@ -11,14 +11,14 @@
             <div class="product">
                 <div 
                     class="image"
-                    style="background-image: url('{{ product.img}}')"
+                    style="background-image: url('{{ product.img }}')"
                 >
                 </div>
 
                 <div class="price">                    
-                    <p>{{ product.price }}</p>
-                    {% if product.oldPrice != product.price %}
-                        <div class="old-price">{{ product.oldPrice }}</div>
+                    <p>{{ product.formattedPrice }}</p>
+                    {% if product.formattedOldPrice != product.formattedPrice %}
+                        <div class="old-price">{{ product.formattedOldPrice }}</div>
                     {% endif %}
                 </div>
                 

@@ -19,6 +19,7 @@
 
 .messages.error {
     background: #E74C3C;
+    z-index: 1000;
 }
 
 .messages.success {
